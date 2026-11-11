@@ -15,6 +15,10 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
     redirect("/authentication");
   }
 
+  if (!session.user.clinic) {
+    redirect("/clinic-form");
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

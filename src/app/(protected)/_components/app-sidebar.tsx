@@ -114,7 +114,7 @@ export const AppSidebar = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm">{session.data?.user.name}</p>
+                    <p className="text-sm">{session.data?.user.clinic?.name}</p>
                     <p className="text-muted-foreground text-sm">
                       {session.data?.user.email}
                     </p>
