@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { usersToClinicsTable } from "@/db/schema";
+import { usersTable, usersToClinicsTable } from "@/db/schema";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -20,9 +20,13 @@ export const auth = betterAuth({
         where: eq(usersToClinicsTable.userId, user.id),
         with: { clinic: true },
       });
+      const dbUser = await db.query.usersTable.findFirst({
+        where: eq(usersTable.id, user.id),
+      });
       return {
         user: {
           ...user,
+          plan: dbUser?.plan ?? null,
           clinic: userClinic
             ? { id: userClinic.clinicId, name: userClinic.clinic.name }
             : undefined,

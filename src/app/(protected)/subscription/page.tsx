@@ -1,8 +1,37 @@
-const SubscriptionPage = () => {
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import {
+  PageContainer,
+  PageContent,
+  PageDescription,
+  PageHeader,
+  PageHeaderContent,
+  PageTitle,
+} from "@/components/ui/page-container";
+import { auth } from "@/lib/auth";
+
+import SubscriptionPlan from "./_components/subscription-plan";
+
+const SubscriptionPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session?.user) {
+    redirect("/authentication");
+  }
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">Assinatura</h1>
-    </div>
+    <PageContainer>
+      <PageHeader>
+        <PageHeaderContent>
+          <PageTitle>Assinatura</PageTitle>
+          <PageDescription>Gerencie a assinatura da sua conta</PageDescription>
+        </PageHeaderContent>
+      </PageHeader>
+      <PageContent>
+        <SubscriptionPlan active={session.user.plan === "essential"} />
+      </PageContent>
+    </PageContainer>
   );
 };
 
