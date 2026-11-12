@@ -1,17 +1,18 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
+import { MAX_DOCTORS_ESSENTIAL_PLAN } from "@/helpers/plan-limits";
 import { clinicActionClient } from "@/lib/next-safe-action";
 
 import { upsertDoctorSchema } from "./schema";
 
 export const upsertDoctor = clinicActionClient
   .schema(upsertDoctorSchema)
-  .action(async ({ parsedInput: { id, ...data }, ctx: { clinicId } }) => {
+  .action(async ({ parsedInput: { id, ...data }, ctx: { clinicId, user } }) => {
     if (id) {
       const updated = await db
         .update(doctorsTable)
@@ -24,6 +25,15 @@ export const upsertDoctor = clinicActionClient
         throw new Error("Médico não encontrado");
       }
     } else {
+      if (user.plan === "essential") {
+        const [{ total }] = await db
+          .select({ total: count() })
+          .from(doctorsTable)
+          .where(eq(doctorsTable.clinicId, clinicId));
+        if (total >= MAX_DOCTORS_ESSENTIAL_PLAN) {
+          throw new Error("Limite de médicos do plano atingido");
+        }
+      }
       await db.insert(doctorsTable).values({ ...data, clinicId });
     }
     revalidatePath("/doctors");

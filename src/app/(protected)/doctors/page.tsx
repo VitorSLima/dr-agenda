@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/page-container";
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
+import { MAX_DOCTORS_ESSENTIAL_PLAN } from "@/helpers/plan-limits";
 import { auth } from "@/lib/auth";
 
 import AddDoctorButton from "./_components/add-doctor-button";
@@ -29,6 +30,9 @@ const DoctorsPage = async () => {
     where: eq(doctorsTable.clinicId, session.user.clinic.id),
     orderBy: doctorsTable.name,
   });
+  const limitReached =
+    session.user.plan === "essential" &&
+    doctors.length >= MAX_DOCTORS_ESSENTIAL_PLAN;
   return (
     <PageContainer>
       <PageHeader>
@@ -37,7 +41,7 @@ const DoctorsPage = async () => {
           <PageDescription>Gerencie os médicos da sua clínica</PageDescription>
         </PageHeaderContent>
         <PageActions>
-          <AddDoctorButton />
+          <AddDoctorButton disabled={limitReached} />
         </PageActions>
       </PageHeader>
       <PageContent>
