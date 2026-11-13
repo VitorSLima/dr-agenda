@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17
+    container_name: dr-agenda-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dr_agenda
+    ports:
+      - "5432:5432"
+    volumes:
+      - dr_agenda_data:/var/lib/postgresql/data
+
+volumes:
+  dr_agenda_data:
