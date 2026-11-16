@@ -1,0 +1,1 @@
+export const MAX_DOCTORS_ESSENTIAL_PLAN = 3;
